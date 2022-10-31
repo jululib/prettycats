@@ -1,0 +1,17 @@
+/* сборщик стилей через импорт, длоя удобства у каждого объекта свой файл стилизации и сводится все в этот */
+
+@import url("./setup/variables.css");
+@import url("./setup/base.css");
+@import url("./box.css");
+@import url("./logo.css");
+@import url("./btn.css");
+@import url("./header.css");
+@import url("./footer.css");
+@import url("./socials.css");
+@import url("./copyright.css");
+@import url("./page.css");
+@import url("./main.css");
+@import url("./cards.css");
+@import url("./card.css");
+@import url("./popup.css");
+@import url("./form.css");
