@@ -6,7 +6,7 @@
 
 .form__image {
     grid-row: span 3;
-    background-image: url("../../assets/images/cat.jpg");
+    background-image: url("../assets/images/cat.jpg");
     background-size: cover;
     background-repeat: no-repeat;
 }

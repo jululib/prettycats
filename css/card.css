@@ -60,7 +60,7 @@
     right: 0;
     bottom: 0;
     background-color: #fff8;
-    backdrop-filter: blur(2px);
+    backdrop-filter: blur(0.5px);
     transition: .5s linear;
     transition-property: backdrop-filter, background-color;
 }

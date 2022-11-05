@@ -40,22 +40,30 @@ class Api {
     constructor(config){
         this._url = config.url;
         this._headers = config.headers;
-        console.log('API');
+        // console.log('API');
     }
 
+       //выделенная функция для обработки полученного ответа от сервера, обрабатываем на на наличие ответа ок
+            // если ответ ок, то в клиентоском коде, обрабатываем пришедшие данные
+    _onResponce(res){
+        return res.ok ? res.json() : Promise.reject({...res, message: "error on server"});
+    }
+
+    
+
     getAllCats(){
-        fetch(`${this._url}/show`, {
+        return fetch(`${this._url}/show`, {
             method: 'GET'
-        })
+        }) .then(this._onResponce); 
     }
 
 
     addNewCat(data){
-        fetch(`${this._url}/add`, {
+        return fetch(`${this._url}/add`, {
             method: 'POST',
             body: JSON.stringify(data),
             headers: this._headers
-        })
+        }).then(this._onResponce); 
     }
 
     updateCatById(idCat, data){
