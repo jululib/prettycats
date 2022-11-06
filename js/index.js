@@ -54,6 +54,8 @@ function handleFormAddCat(e) {
     const dataFromForm =  serialiseForm(elementsFormCat);
     api.addNewCat(dataFromForm).then(()=>{
         createCat(dataFromForm);
+        //обновляем локальное хранилище, после создания кота
+        updateLS(dataFromForm, {type: 'ADD_CAT'})
         popupInst.close();
     })
 }
@@ -64,6 +66,7 @@ function handleFormLogin(e) {
         const dataFromForm =  serialiseForm(elementsFormCat);
         Cookies.set("email", `email=${dataFromForm.email}`);
         btnOpenFormPopup.classList.remove("visually-hidden");
+        btnOpenLoginPopup.classList.add("visually-hidden");
         popupLogin.close();
     
 }
@@ -85,8 +88,8 @@ function checkLS(){
     // проверяем на наличие данных и не пустой ли массив и такущие даты и время меньше последнего обновления
     if (LSData && LSData.length && new Date() < new Date(getTimeExpire)){
         // если да, то отрисовываем котиков из локального хранилище
-        LSData.forEach(function(infoCat){
-            createCat(infoCat); 
+        LSData.forEach(function(catData){
+            createCat(catData); 
         }) 
         // если нет, то получаем из API
     } else {
@@ -94,18 +97,37 @@ function checkLS(){
         api.getAllCats()
         .then(({data})=>{
             // Для каждого элемента массива котов, с параметром инфо о кот
-            data.forEach(function(infoCat) {
-                createCat(infoCat);
+            data.forEach(function(catData) {
+                createCat(catData);
             })
-            // и записываем в локальное хранилище
-            localStorage.setItem('cats', JSON.stringify(data))
-            setDataRefresh(1);
+            // обновляем хранилище
+            updateLS(data, {type: 'ALL_CATS'})
         })
     }
 }
-
-checkLS();
-
+// функция обновления локального хранилища
+function updateLS(data, action) { 
+    // создаем слепок хранилища
+    const oldStorage = JSON.parse(localStorage.getItem('cats'));
+    // обработка разных сценариев обновления
+    switch (action.type) {
+        case 'ADD_CAT':
+            oldStorage.push(data);
+            localStorage.setItem('cats', JSON.stringify(oldStorage))
+            return;
+        case 'ALL_CATS': 
+            localStorage.setItem('cats', JSON.stringify(data));
+            setDataRefresh(2, 'catsRefresh');
+            return;
+        case 'DELETE_CAT':
+            // проверка на наличие ид в дате и слепке ЛС
+            const newStorage = oldStorage.filter(cat => cat.id !== data.id)
+            localStorage.setItem('cats', JSON.stringify(newStorage))
+            return;
+        default:
+            break;
+    }
+}
 
 // событие открытия попапа
 btnOpenFormPopup.addEventListener('click', () => popupInst.open())
@@ -117,7 +139,11 @@ formSignInSubmit.addEventListener('submit', handleFormLogin)
 
 const isAuth = Cookies.get("email");
 
+// проверка на наличие куки
 if (!isAuth) {
-    // popupLogin.open();
     btnOpenFormPopup.classList.add("visually-hidden");
-  }
+  } else {
+    btnOpenLoginPopup.classList.add("visually-hidden");
+}
+
+checkLS();
